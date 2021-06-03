@@ -1,21 +1,24 @@
 const Users = require('../users/users-model');
 
 function logger(req, res, next) {
-  console.log('logger->', 'method:', [req.method], 'url:', req.path, 'timestamp:', Date.now());
+  console.log('logger->', 
+    'method:', [req.method], 
+    'url:', req.path, 
+    'timestamp:', Date.now());
   next()
 }
 
 function validateUserId(req, res, next) {
   Users.getById(req.params.id)
-    .then(user => {
+    .then(user => { // the endpoint is reached
       if(!user) {
-        res.status(404).json({ message: "user not found" })
+        res.status(404).json({ message: "user not found" }) // res is for sending back to the client
       } else {
           req.user = user
           next()
       }
     })
-    .catch(next);
+    .catch(next); // the endpoint is never reached
 }
 
 function validateUser(req, res, next) {

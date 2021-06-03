@@ -2,7 +2,6 @@ const express = require('express');
 const Users = require('./users-model');
 const Posts = require('../posts/posts-model');
 const { 
-  logger,
   validateUserId,
   validateUser,
   validatePost
@@ -13,22 +12,24 @@ const {
 
 const router = express.Router();
 
-router.get('/', logger, (req, res, next) => {
+router.get('/', (req, res, next) => {
   // RETURN AN ARRAY WITH ALL THE USERS
   Users.get()
     .then(users => {
       res.json(users)
     })
-    .catch(next)
+    .catch(err => {
+      next(err)
+    });
 });
 
-router.get('/:id', logger, validateUserId, (req, res, next) => {
+router.get('/:id', validateUserId, (req, res, next) => {
   // RETURN THE USER OBJECT
   // this needs a middleware to verify user id
   res.status(200).json(req.user)
 });
 
-router.post('/', logger, validateUser, (req, res, next) => {
+router.post('/', validateUser, (req, res, next) => {
   // RETURN THE NEWLY CREATED USER OBJECT
   // this needs a middleware to check that the request body is valid
   Users.insert(req.user)
@@ -38,7 +39,7 @@ router.post('/', logger, validateUser, (req, res, next) => {
     .catch(next)
 });
 
-router.put('/:id', logger, validateUserId, validateUser, (req, res, next) => {
+router.put('/:id', validateUserId, validateUser, (req, res, next) => {
   // RETURN THE FRESHLY UPDATED USER OBJECT
   // this needs a middleware to verify user id
   // and another middleware to check that the request body is valid
@@ -53,7 +54,7 @@ router.put('/:id', logger, validateUserId, validateUser, (req, res, next) => {
     .catch(next)
 });
 
-router.delete('/:id', logger, validateUserId, (req, res, next) => {
+router.delete('/:id', validateUserId, (req, res, next) => {
   // RETURN THE FRESHLY DELETED USER OBJECT
   // this needs a middleware to verify user id
   Users.getById(req.user.id)
@@ -67,7 +68,7 @@ router.delete('/:id', logger, validateUserId, (req, res, next) => {
     .catch(next)
 });
 
-router.get('/:id/posts', logger, validateUserId, (req, res, next) => {
+router.get('/:id/posts', validateUserId, (req, res, next) => {
   // RETURN THE ARRAY OF USER POSTS
   // this needs a middleware to verify user id
   Users.getUserPosts(req.params.id)
@@ -77,7 +78,7 @@ router.get('/:id/posts', logger, validateUserId, (req, res, next) => {
     .catch(next);
 });
 
-router.post('/:id/posts', logger, validateUserId, validatePost, (req, res, next) => {
+router.post('/:id/posts', validateUserId, validatePost, (req, res, next) => {
   // RETURN THE NEWLY CREATED USER POST
   // this needs a middleware to verify user id
   // and another middleware to check that the request body is valid
